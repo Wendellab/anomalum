@@ -1,0 +1,3 @@
+[submodule "repeat-clustering/pipeline"]
+	path = repeat-clustering/pipeline
+	url = https://gitlab.com/IGBB/pipelines/repeat-clustering.git

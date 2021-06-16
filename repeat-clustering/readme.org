@@ -1,0 +1,47 @@
+#+TITLE: readme
+#+PROPERTY:  header-args :var DIR=(file-name-directory buffer-file-name)
+
+
+#+NAME: samples
+| SRA        | Genome Group | Organism               | Sample Name               |   GS | # 90 nt reads for 1% |
+|------------+--------------+------------------------+---------------------------+------+----------------------|
+| SRR8979969 | A1           | Gossypium herbaceum    | A1_155                    | 1667 | 185222              |
+| SRR8979922 | A2           | Gossypium arboreum     | A2_101                    | 1710 | 190000              |
+| SRR3560153 | B1           | Gossypium anomalum     | G. anomalum               | 1359 | 151000              |
+| SRR8979990 | C1           | Gossypium sturtianum   | PI530751                  | 2015 | 223889              |
+| SRR8979901 | C2           | Gossypium robinsonii   | C2rob_ISU1024             | 1951 | 216778              |
+| SRR847980  | D5           | Gossypium raimondii    | D5_31                     |  880 | 97778               |
+| SRR8136255 | D10          | Gossypium turneri      | D10-7                     |  910 | 101111              |
+| SRR3560149 | D6           | Gossypium gossypioides | G. gossypioides           |  841 | 93444               |
+| SRR8136271 | D8           | Gossypium trilobum     | D8-8                      |  851 | 94556               |
+| SRR8136274 | D9           | Gossypium laxum        | D9-4                      |  934 | 103778              |
+| SRR3560162 | E2           | Gossypium somalense    | G. somalense E2-3         | 1496 | 166222              |
+| SRR617704  | F1           | Gossypium longicalyx   | Gossypium longicalyx F1-1 | 1311 | 145667              |
+| SRR3560189 | G1           | Gossypium bickii       | G. bickii                 | 1756 | 195111              |
+| SRR8979992 | G2           | Gossypium australe     | G2aus_oldplant            | 1834 | 203778              |
+| SRR8979903 | G3           | Gossypium nelsonii     | ISU1019                   | 1756 | 195111              |
+| SRR3560141 | K1           | Gossypium exiguum      | G. exiguum                | 2460 | 273333              |
+
+#+BEGIN_SRC sh :var  samples=samples :tangle run.sh
+
+cd $DIR
+
+sizes=()
+
+for lib in "${!samples[@]}"; do
+    readarray -t samp <<< "${samples[$lib]}"
+
+    sizes+=("$lib=${samp[4]}")
+done
+
+
+make -j$SLURM_NTASKS -f $DIR/pipeline/makefile \
+    SRA="${!samples[*]}" \
+    CPUS=$SLURM_CPUS_PER_TASK \
+    DATABASE=$DIR/RBplantsANDcotton.21.08.fixedDec2016.fasta \
+    "${sizes[@]}"
+
+
+#+END_SRC
+
+#+RESULTS:
