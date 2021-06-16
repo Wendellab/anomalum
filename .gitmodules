@@ -4,3 +4,6 @@
 [submodule "dotplots/pipeline"]
 	path = dotplots/pipeline
 	url = https://gitlab.com/IGBB/pipelines/dotplots.git
+[submodule "annotations/pipeline"]
+	path = annotations/pipeline
+	url = https://gitlab.com/IGBB/pipelines/annotation.git
