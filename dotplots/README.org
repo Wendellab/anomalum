@@ -1,0 +1,60 @@
+#+TITLE: README
+
+
+#+NAME: raw_files
+| Name | File                                               |
+|------+----------------------------------------------------|
+| A1   | Gherbaceum_A1-0076_WHUv3.0rc.genome.standard.fa.gz |
+| A2   | Garboreum_Shixiya1_WHUv3.0rc.genome.standard.fa.gz |
+| D5   | D5.v1.pred.fa.gz                                   |
+| D10  | gturneri_large_chr_c.fasta.gz                      |
+| F1   | longicalyx.fasta.gz                                |
+| G2   | GCA_005393395.2_CCRI_HENU_Gaus_1.1_genomic.fna.gz  |
+| E1   | stocksii.V1.0.hic_juiced.fasta                     |
+| D3d  | G.davidsonii_ICR_genomic_v1.0.fa.gz                |
+| D1   | G.thurberi_ICR_genomic.fa.gz                       |
+
+#+BEGIN_SRC sh :tangle 0-ref/chrs.sh :var files=raw_files
+ml singularity/3.5.2 samtools
+
+for name in ${!files[@]}; do
+    zcat 0-ref/${files[$name]} > 0-ref/$name.fa
+    samtools faidx 0-ref/$name.fa
+    sort -k2,2nr 0-ref/$name.fa.fai |
+        head -13 | cut -f 1 |
+        xargs singularity exec \
+            /apps/singularity-3/samtools/samtools-v1.9-4-deb_cv1.sif \
+            samtools faidx 0-ref/$name.fa > 0-ref/$name.chr.fa
+done
+#+END_SRC
+
+#+BEGIN_SRC sh :tangle run.sh :var names=raw_files[,0]
+name=${names[$SLURM_ARRAY_TASK_ID]}
+    make -f pipeline/dotplot.mk \
+        NAME=$name GENOME=anom_juiced.V1.1.fasta \
+        REFERENCE=0-ref/$name.chr.fa \
+        CPUS=48
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC sh :tangle label.sh :var names=raw_files[,0]
+for name in ${names[@]}; do
+convert \( -background white -fill grey -pointsize 500 -size 1500x1500 \
+    label:$name -bordercolor none -border 150x150 \) \
+    -size 3600x3600 xc:white +swap -composite \
+     \( $name.png -transparent white \) -composite $name.label.png
+done
+#+END_SRC
+
+#+RESULTS:
+
+
+#+BEGIN_SRC sh :var names=raw_files[,0]
+
+montage -border 0 -geometry 1000x  -tile 0x2 {A1,D5,E1,A2,D10,F1}.label.png dotplots.png
+
+montage -border 0 -geometry x1000  -tile 2x0 {A1,A2,D1,D3d,D5,D10,E1,F1}.label.png all.dotplots.png
+#+END_SRC
+
+#+RESULTS:
