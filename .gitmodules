@@ -7,3 +7,6 @@
 [submodule "annotations/pipeline"]
 	path = annotations/pipeline
 	url = https://gitlab.com/IGBB/pipelines/annotation.git
+[submodule "introgression/G3V"]
+	path = introgression/G3V
+	url = https://gitlab.com/IGBB/G3V.git
